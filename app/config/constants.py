@@ -1,0 +1,5 @@
+DATABASE_NAME = "multi_tenant_auth_db"
+PASSWORD = "mysql"
+HOST = "localhost"
+PORT = "3306"
+DATABASE_URL = f"mysql+asyncmy://root:{PASSWORD}@{HOST}:{PORT}/{DATABASE_NAME}"
