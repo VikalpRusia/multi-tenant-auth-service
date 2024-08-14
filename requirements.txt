@@ -1,0 +1,9 @@
+asyncmy==0.2.9
+fastapi==0.112.0
+fastapi-restful[all]==0.6.0
+greenlet==3.0.3
+sqlalchemy==2.0.32
+uvicorn==0.30.6
+
+# required for fastapi
+pydantic==2.8.2

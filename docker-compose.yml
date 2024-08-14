@@ -1,0 +1,23 @@
+version: '3.7'
+
+services:
+
+  multi-tenant-auth-service:
+    image: multi-tenant-auth-service
+    build:
+      context: .
+
+  mysql:
+    # mysql db for persistence
+    image: mysql
+    container_name: mysql
+    volumes:
+      - mysql_data_container:/var/lib/mysql
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: mysql
+
+volumes:
+  mysql_data_container:
