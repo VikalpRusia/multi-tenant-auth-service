@@ -7,7 +7,7 @@ Base = declarative_base()
 
 
 class User(Base):
-    __tablename__ = 'users'
+    __tablename__ = "users"
     id = Column(Integer, primary_key=True, autoincrement=True)
     email: str = Column(String(20), unique=True, nullable=False)
     password: str = Column(String(60), nullable=False)
@@ -16,4 +16,3 @@ class User(Base):
     settings: dict = Column(JSON, default={}, nullable=True)
     created_at: int = Column(BigInteger, nullable=True)
     updated_at: int = Column(BigInteger, nullable=True)
-

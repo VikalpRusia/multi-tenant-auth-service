@@ -16,7 +16,6 @@ class User(UserBase):
     model_config = ConfigDict(from_attributes=True)
 
 
-
 class UserCreate(UserBase):
     password: SecretStr
 
@@ -25,21 +24,23 @@ class UserCreate(UserBase):
     def password_must_be_strong(cls, secret: SecretStr) -> SecretStr:
         plain_password = secret.get_secret_value()
         if len(plain_password) < 8:
-            raise ValueError('Password must be at least 8 characters long')
+            raise ValueError("Password must be at least 8 characters long")
         if not re.search(r"[A-Z]", plain_password):
-            raise ValueError('Password must contain at least one uppercase letter')
+            raise ValueError("Password must contain at least one uppercase letter")
         if not re.search(r"[a-z]", plain_password):
-            raise ValueError('Password must contain at least one lowercase letter')
+            raise ValueError("Password must contain at least one lowercase letter")
         if not re.search(r"[0-9]", plain_password):
-            raise ValueError('Password must contain at least one digit')
+            raise ValueError("Password must contain at least one digit")
         if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", plain_password):
-            raise ValueError('Password must contain at least one special character')
+            raise ValueError("Password must contain at least one special character")
         salt = gensalt()
-        return SecretStr(hashpw(password=plain_password.encode("utf-8"), salt=salt).decode("utf-8"))
+        return SecretStr(
+            hashpw(password=plain_password.encode("utf-8"), salt=salt).decode("utf-8")
+        )
 
     @override
     def model_dump(self, show_password=False, **kwargs) -> dict:
         result = super().model_dump(**kwargs)
         if show_password:
-            result['password'] = self.password.get_secret_value()
+            result["password"] = self.password.get_secret_value()
         return result

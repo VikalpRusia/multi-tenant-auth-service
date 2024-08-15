@@ -10,7 +10,6 @@ router = APIRouter(prefix="/users", tags=["users"])
 
 @cbv(router)
 class UserAPI:
-
     def __init__(self):
         self.controller = UserController()
 

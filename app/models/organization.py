@@ -5,7 +5,7 @@ Base = declarative_base()
 
 
 class Organization(Base):
-    __tablename__ = 'organizations'
+    __tablename__ = "organizations"
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(10), nullable=False)
     status = Column(Integer, default=0, nullable=False)

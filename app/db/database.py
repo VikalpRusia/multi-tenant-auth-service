@@ -18,8 +18,8 @@ from models.role import Role
 
 logger = logging.getLogger(__name__)
 
-class DatabaseSessionManager:
 
+class DatabaseSessionManager:
     def __init__(self, host: str, engine_kwargs: dict[str, Any] = {}):
         self.engine = create_async_engine(host, **engine_kwargs)
         self.async_session = async_sessionmaker(bind=self.engine, autocommit=False)

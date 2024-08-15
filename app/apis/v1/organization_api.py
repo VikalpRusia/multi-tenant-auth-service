@@ -7,12 +7,14 @@ from schemas.organization import Organization, OrganizationCreate
 
 router = APIRouter(prefix="/organization", tags=["organization"])
 
+
 @cbv(router)
 class OrganizationAPI:
-
     def __init__(self):
         self.controller = OrganizationController()
-    @router.post("/")
-    async def sign_up(self, org: OrganizationCreate, db=Depends(get_db_session)) -> Organization:
-        return await self.controller.save_org(org, db)
 
+    @router.post("/")
+    async def sign_up(
+        self, org: OrganizationCreate, db=Depends(get_db_session)
+    ) -> Organization:
+        return await self.controller.save_org(org, db)

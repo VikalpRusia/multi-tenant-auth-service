@@ -15,7 +15,5 @@ class Organization(OrganizationBase):
     model_config = ConfigDict(from_attributes=True)
 
 
-
 class OrganizationCreate(OrganizationBase):
     model_config = ConfigDict(from_attributes=True)
-
