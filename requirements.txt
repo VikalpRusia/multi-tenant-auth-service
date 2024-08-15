@@ -1,11 +1,11 @@
 alembic==1.13.2
 asyncmy==0.2.9
+bcrypt==4.2.0
 cryptography==43.0.0
 fastapi==0.112.0
 fastapi-restful[all]==0.6.0
 greenlet==3.0.3
 sqlalchemy==2.0.32
-passlib[bcrypt]==1.7.4
 pyjwt==2.9.0
 uvicorn==0.30.6
 

@@ -1,10 +1,9 @@
 import re
 from typing import Optional, override
 
-from passlib.context import CryptContext
+from bcrypt import hashpw, gensalt
 from pydantic import BaseModel, Field, field_validator, SecretStr
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 class UserBase(BaseModel):
     email: str = Field(pattern=r".+@.+\.com$", examples=["example@gmail.com"])
@@ -30,7 +29,8 @@ class UserCreate(UserBase):
             raise ValueError('Password must contain at least one digit')
         if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", plain_password):
             raise ValueError('Password must contain at least one special character')
-        return SecretStr(pwd_context.hash(plain_password))
+        salt = gensalt()
+        return SecretStr(hashpw(password=plain_password.encode("utf-8"), salt=salt).decode("utf-8"))
 
     @override
     def model_dump(self,show_password=False,**kwargs) -> dict:
