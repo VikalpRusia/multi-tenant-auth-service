@@ -11,3 +11,4 @@ uvicorn==0.30.6
 
 # required for fastapi
 pydantic==2.8.2
+python-multipart==0.0.9
