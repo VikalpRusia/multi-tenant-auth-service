@@ -2,7 +2,7 @@ import re
 from typing import Optional, override
 
 from bcrypt import hashpw, gensalt
-from pydantic import BaseModel, Field, field_validator, SecretStr
+from pydantic import BaseModel, Field, field_validator, SecretStr, ConfigDict
 
 
 class UserBase(BaseModel):
@@ -10,6 +10,11 @@ class UserBase(BaseModel):
     profile: dict = {}
     status: int = 0
     settings: Optional[dict] = {}
+
+
+class User(UserBase):
+    model_config = ConfigDict(from_attributes=True)
+
 
 
 class UserCreate(UserBase):
@@ -33,10 +38,8 @@ class UserCreate(UserBase):
         return SecretStr(hashpw(password=plain_password.encode("utf-8"), salt=salt).decode("utf-8"))
 
     @override
-    def model_dump(self,show_password=False,**kwargs) -> dict:
+    def model_dump(self, show_password=False, **kwargs) -> dict:
         result = super().model_dump(**kwargs)
         if show_password:
             result['password'] = self.password.get_secret_value()
         return result
-
-
