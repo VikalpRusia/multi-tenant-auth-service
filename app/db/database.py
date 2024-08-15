@@ -39,7 +39,9 @@ class DatabaseSessionManager:
         async with self.engine.begin() as conn:
             try:
                 yield conn
-            except Exception:
+            except Exception as exception:
+                logger.error(f"An unexpected error occurred: {str(exception)}")
+                logger.error(traceback.format_exc())
                 await conn.rollback()
                 raise
 
@@ -50,8 +52,9 @@ class DatabaseSessionManager:
         async with self.async_session.begin() as conn:
             try:
                 yield conn
-            except Exception:
-                logger.error("An unexpected error occurred: %s")
+            except Exception as exception:
+                logger.error(f"An unexpected error occurred: {str(exception)}")
+                logger.error(traceback.format_exc())
                 await conn.rollback()
                 raise
 
