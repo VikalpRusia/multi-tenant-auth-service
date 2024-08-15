@@ -5,6 +5,8 @@ fastapi==0.112.0
 fastapi-restful[all]==0.6.0
 greenlet==3.0.3
 sqlalchemy==2.0.32
+passlib[bcrypt]==1.7.4
+pyjwt==2.9.0
 uvicorn==0.30.6
 
 # required for fastapi

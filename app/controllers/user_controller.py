@@ -14,4 +14,3 @@ class UserController:
         user_model = User(**user.model_dump(show_password=True), created_at=epoch_time, updated_at=epoch_time)
         db.add(user_model)
         return user_model
-
