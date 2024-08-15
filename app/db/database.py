@@ -1,5 +1,7 @@
 import asyncio
 import contextlib
+import logging
+import traceback
 from typing import Any, AsyncIterator
 
 from sqlalchemy.ext.asyncio import (
@@ -14,6 +16,7 @@ from models.member import Member
 from models.organization import Organization
 from models.role import Role
 
+logger = logging.getLogger(__name__)
 
 class DatabaseSessionManager:
 
@@ -36,10 +39,9 @@ class DatabaseSessionManager:
         async with self.engine.begin() as conn:
             try:
                 yield conn
-            except Exception as exception:
+            except Exception:
                 await conn.rollback()
-                await self.close()
-                raise exception
+                raise
 
     @contextlib.asynccontextmanager
     async def session(self) -> AsyncIterator[AsyncSession]:
@@ -48,10 +50,10 @@ class DatabaseSessionManager:
         async with self.async_session.begin() as conn:
             try:
                 yield conn
-            except Exception as exception:
+            except Exception:
+                logger.error("An unexpected error occurred: %s")
                 await conn.rollback()
-                await self.close()
-                raise exception
+                raise
 
 
 sessionmanager = DatabaseSessionManager(DATABASE_URL, {"echo": True})
@@ -60,38 +62,3 @@ sessionmanager = DatabaseSessionManager(DATABASE_URL, {"echo": True})
 async def get_db_session() -> AsyncSession:
     async with sessionmanager.session() as session:
         yield session
-
-async def main():
-    async for session in get_db_session():
-        # If you want to add multiple objects:
-        new_org = Organization(
-            name='Acme Corp',
-            status=1,
-            personal=False,
-            settings={'subscription': 'premium'},
-            created_at=1699999999,
-            updated_at=1699999999
-        )
-
-        new_role = Role(
-            name='Manager',
-            description='Manages teams and projects',
-            created_at=1699999999,
-            updated_at=1699999999
-        )
-
-        # new_member = Member(
-        #     org_id=1,  # Assuming this is the ID of 'Acme Corp' in the 'organization' table
-        #     user_id=1,  # Assuming this is the ID of 'john.doe@example.com' in the 'users' table
-        #     role_id=1,  # Assuming this is the ID of 'Manager' in the 'role' table
-        #     status=1,
-        #     settings={'notifications': 'enabled'},
-        #     created_at=1699999999,
-        #     updated_at=1699999999
-        # )
-
-        # Add multiple objects to the session
-        session.add_all([new_org, new_role])
-
-if __name__ == "__main__":
-    asyncio.run(main())
