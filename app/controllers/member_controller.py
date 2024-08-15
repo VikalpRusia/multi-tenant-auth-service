@@ -8,7 +8,7 @@ from schemas.member import MemberCreate
 
 class MemberController:
     @staticmethod
-    async def save_member(member: MemberCreate, db: AsyncSession):
+    async def save_member(member: MemberCreate, db: AsyncSession) -> Member:
         epoch_time = int(time.time())
         member_model = Member(
             **member.model_dump(), created_at=epoch_time, updated_at=epoch_time

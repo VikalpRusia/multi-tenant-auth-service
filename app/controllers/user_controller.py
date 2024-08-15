@@ -8,7 +8,7 @@ from schemas.user import UserCreate
 
 class UserController:
     @staticmethod
-    async def save_user(user: UserCreate, db: AsyncSession):
+    async def save_user(user: UserCreate, db: AsyncSession) -> User:
         epoch_time = int(time.time())
         user_model = User(
             **user.model_dump(show_password=True),

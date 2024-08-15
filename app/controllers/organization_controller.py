@@ -8,7 +8,7 @@ from schemas.organization import OrganizationCreate
 
 class OrganizationController:
     @staticmethod
-    async def save_org(org: OrganizationCreate, db: AsyncSession):
+    async def save_org(org: OrganizationCreate, db: AsyncSession) -> Organization:
         epoch_time = int(time.time())
         org_model = Organization(
             **org.model_dump(), created_at=epoch_time, updated_at=epoch_time
