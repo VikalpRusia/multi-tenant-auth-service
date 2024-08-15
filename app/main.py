@@ -1,6 +1,6 @@
 
 from fastapi import FastAPI
-from api import router
+from apis import router
 
 
 app = FastAPI(docs_url="/")

@@ -36,9 +36,10 @@ class DatabaseSessionManager:
         async with self.engine.begin() as conn:
             try:
                 yield conn
-            except Exception:
+            except Exception as exception:
                 await conn.rollback()
                 await self.close()
+                raise exception
 
     @contextlib.asynccontextmanager
     async def session(self) -> AsyncIterator[AsyncSession]:
@@ -48,9 +49,9 @@ class DatabaseSessionManager:
             try:
                 yield conn
             except Exception as exception:
-                print(exception)
                 await conn.rollback()
                 await self.close()
+                raise exception
 
 
 sessionmanager = DatabaseSessionManager(DATABASE_URL, {"echo": True})

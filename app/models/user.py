@@ -1,3 +1,5 @@
+from typing import override
+
 from sqlalchemy import Column, String, JSON, Integer, BigInteger
 from sqlalchemy.orm import declarative_base
 
@@ -14,3 +16,4 @@ class User(Base):
     settings: dict = Column(JSON, default={}, nullable=True)
     created_at: int = Column(BigInteger, nullable=True)
     updated_at: int = Column(BigInteger, nullable=True)
+
