@@ -4,6 +4,7 @@ from fastapi_restful.cbv import cbv
 from controllers.member_controller import MemberController
 from db.database import get_db_session
 from schemas.member import MemberCreate, Member, UpdateMember
+from schemas.user_invite import UserInvite
 
 router = APIRouter(prefix="/member", tags=["Member"])
 
@@ -41,3 +42,8 @@ class MemberAPI:
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Member doesn't exist to be deleted",
         )
+
+    @router.post("/invite")
+    async def invite(self, member_invite: UserInvite, db=Depends(get_db_session)):
+        await self.member_controller.invite_member(member_invite, db)
+        return {"message": "invited"}

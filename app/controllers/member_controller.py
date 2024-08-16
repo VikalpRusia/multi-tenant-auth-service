@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from models import Member
 from schemas.member import MemberCreate, UpdateMember
+from schemas.user_invite import UserInvite
 
 
 class MemberController:
@@ -35,3 +36,11 @@ class MemberController:
             await db.flush()
             return True
         return False
+
+    @staticmethod
+    async def invite_member(member_invite: UserInvite, db: AsyncSession):
+        member = Member(**member_invite.model_dump())
+        db.add(member)
+        await db.flush()
+        await db.refresh(member)
+        return member
