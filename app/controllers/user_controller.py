@@ -1,10 +1,9 @@
 import time
 from datetime import timedelta, datetime, timezone
 
-import bcrypt
 import jwt
 from bcrypt import checkpw
-from fastapi import HTTPException, status
+from fastapi import HTTPException, status, BackgroundTasks
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -87,7 +86,7 @@ class UserController:
         )
 
     @staticmethod
-    async def reset_password(email: str, db: AsyncSession) -> None:
+    async def reset_password(email: str, db: AsyncSession, background_tasks: BackgroundTasks) -> None:
         user = await UserController.get_user(email, db)
         if user is None:
             raise HTTPException(
@@ -95,7 +94,7 @@ class UserController:
             )
         token = UserController.create_token(
             {"sub": email, "type": "password_reset_token"},
-            expires_delta=timedelta(hours=1),
+            expires_delta=timedelta(minutes=10),
         )
         reset_link = f"http://{DOMAIN}/reset-password?token={token}"
         html_content = f"""
@@ -146,7 +145,7 @@ class UserController:
         </body>
         </html>
         """
-        send_email("Password Reset Request", html_content, {"email": user.email})
+        background_tasks.add_task(send_email,"Password Reset Request", html_content, {"email": user.email})
 
     @staticmethod
     def extract_email_from_token(jwt_token: str, token_type: str = ""):
@@ -172,6 +171,5 @@ class UserController:
     @staticmethod
     async def __change_password(email: str, new_password: str, db: AsyncSession):
         user = await UserController.get_user(email, db)
-        salt = bcrypt.gensalt()
         user.password = new_password
         await db.flush()

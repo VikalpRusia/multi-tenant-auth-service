@@ -1,3 +1,5 @@
+import os
+
 DATABASE_NAME = "multi_tenant_auth_db"
 PASSWORD = "mysql"
 HOST = "localhost"
@@ -10,3 +12,4 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 15
 REFRESH_TOKEN_EXPIRE_DAYS = 7
 
 DOMAIN = "localhost:8000"
+EMAIL_API_KEY = os.getenv("EMAIL_API_KEY")
