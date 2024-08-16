@@ -21,4 +21,23 @@ class MemberAPI:
     async def delete_member(self, member_id: int, db=Depends(get_db_session)):
         if await self.member_controller.delete_member(member_id, db):
             return {"message": "deleted"}
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Member doesn't exist to be deleted")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Member doesn't exist to be deleted",
+        )
+
+    @router.patch("/{member_id}")
+    async def update_member(
+        self,
+        member_id: int,
+        update_member_data: UpdateMember,
+        db=Depends(get_db_session),
+    ):
+        if await self.member_controller.update_member(
+            member_id, update_member_data, db
+        ):
+            return {"message": "updated"}
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Member doesn't exist to be deleted",
+        )

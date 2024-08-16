@@ -86,7 +86,9 @@ class UserController:
         )
 
     @staticmethod
-    async def reset_password(email: str, db: AsyncSession, background_tasks: BackgroundTasks) -> None:
+    async def reset_password(
+        email: str, db: AsyncSession, background_tasks: BackgroundTasks
+    ) -> None:
         user = await UserController.get_user(email, db)
         if user is None:
             raise HTTPException(
@@ -145,7 +147,9 @@ class UserController:
         </body>
         </html>
         """
-        background_tasks.add_task(send_email,"Password Reset Request", html_content, {"email": user.email})
+        background_tasks.add_task(
+            send_email, "Password Reset Request", html_content, {"email": user.email}
+        )
 
     @staticmethod
     def extract_email_from_token(jwt_token: str, token_type: str = ""):

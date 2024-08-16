@@ -34,7 +34,10 @@ class UserAPI:
 
     @router.post("/reset-password")
     async def reset_password(
-        self, reset_password: ResetPassword,background_tasks: BackgroundTasks, db=Depends(get_db_session),
+        self,
+        reset_password: ResetPassword,
+        background_tasks: BackgroundTasks,
+        db=Depends(get_db_session),
     ) -> dict:
         await self.controller.reset_password(reset_password.email, db, background_tasks)
         return {"message": "Mail sent successfully"}

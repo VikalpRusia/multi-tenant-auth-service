@@ -18,3 +18,11 @@ class Member(MemberBase):
 
 class MemberCreate(MemberBase):
     model_config = ConfigDict(from_attributes=True)
+
+
+class UpdateMember(BaseModel):
+    org_id: Optional[int]
+    user_id: Optional[int]
+    role_id: Optional[int]
+    status: Optional[int]
+    settings: Optional[dict]

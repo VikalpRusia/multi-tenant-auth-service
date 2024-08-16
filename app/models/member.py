@@ -20,3 +20,6 @@ class Member(Base):
     settings = Column(JSON, default={}, nullable=True)
     created_at = Column(BigInteger, nullable=True)
     updated_at = Column(BigInteger, nullable=True)
+
+    def __setitem__(self, key, value):
+        self.__setattr__(key, value)
