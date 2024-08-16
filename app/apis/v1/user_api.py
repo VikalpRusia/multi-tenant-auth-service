@@ -19,8 +19,13 @@ class UserAPI:
         self.controller = UserController()
 
     @router.post("/")
-    async def sign_up(self, user: UserCreate, db=Depends(get_db_session)) -> User:
-        return await self.controller.save_user(user, db)
+    async def sign_up(
+        self,
+        user: UserCreate,
+        background_tasks: BackgroundTasks,
+        db=Depends(get_db_session),
+    ) -> User:
+        return await self.controller.save_user(user, db, background_tasks)
 
     @router.post("/token")
     async def login(

@@ -4,6 +4,7 @@ from datetime import timedelta, datetime, timezone
 import jwt
 from bcrypt import checkpw
 from fastapi import HTTPException, status, BackgroundTasks
+from jinja2 import Environment, FileSystemLoader
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -22,8 +23,14 @@ from utils.email_service import send_email
 
 
 class UserController:
+    env = Environment(loader=FileSystemLoader("templates"))
+
     @staticmethod
-    async def save_user(user: UserCreate, db: AsyncSession) -> User:
+    async def save_user(
+        user: UserCreate,
+        db: AsyncSession,
+        background_tasks: BackgroundTasks,
+    ) -> User:
         epoch_time = int(time.time())
         user_model = User(
             **user.model_dump(show_password=True),
@@ -33,6 +40,18 @@ class UserController:
         db.add(user_model)
         await db.flush()
         await db.refresh(user_model)
+        html_content = UserController.env.get_template("welcome-mail.html").render(
+            email=user.email
+        )
+        if background_tasks:
+            background_tasks.add_task(
+                send_email,
+                f"Welcome {user.email} to our service",
+                html_content,
+                {"email": user.email},
+            )
+        else:
+            send_email(f"Welcome {user.email} to our service", html_content, {"email": user.email})
         return user_model
 
     @staticmethod
@@ -99,57 +118,18 @@ class UserController:
             expires_delta=timedelta(minutes=10),
         )
         reset_link = f"http://{DOMAIN}/reset-password?token={token}"
-        html_content = f"""
-        <html>
-        <head>
-            <style>
-                .email-container {{
-                    font-family: Arial, sans-serif;
-                    color: #333;
-                    line-height: 1.5;
-                }}
-                .email-header {{
-                    background-color: peachpuff;
-                    padding: 10px;
-                    text-align: center;
-                }}
-                .email-body {{
-                    padding: 20px;
-                }}
-                .reset-link {{
-                    display: inline-block;
-                    padding: 10px 20px;
-                    margin-top: 20px;
-                    color: white;
-                    background-color: #007bff;
-                    text-decoration: none;
-                    border-radius: 5px;
-                }}
-                .reset-link:hover {{
-                    background-color: #0056b3;
-                }}
-            </style>
-        </head>
-        <body>
-            <div class="email-container">
-                <div class="email-header">
-                    <h2>Password Reset Request</h2>
-                </div>
-                <div class="email-body">
-                    <p>Hello,</p>
-                    <p>We received a request to reset your password. Click the button below to reset your password:</p>
-                    <a href="{reset_link}" class="reset-link">Reset Password</a>
-                    <p>If you did not request a password reset, please ignore this email.</p>
-                    <p>Thank you,</p>
-                    <p>Alpha Beta Corp</p>
-                </div>
-            </div>
-        </body>
-        </html>
-        """
-        background_tasks.add_task(
-            send_email, "Password Reset Request", html_content, {"email": user.email}
-        )
+        html_content = UserController.env.get_template(
+            "reset-password-mail.html"
+        ).render(reset_link=reset_link)
+        if background_tasks:
+            background_tasks.add_task(
+                send_email,
+                "Password Reset Request",
+                html_content,
+                {"email": user.email},
+            )
+        else:
+            send_email("Password Reset Request", html_content, {"email": user.email})
 
     @staticmethod
     def extract_email_from_token(jwt_token: str, token_type: str = ""):
