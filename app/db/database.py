@@ -40,8 +40,6 @@ class DatabaseSessionManager:
             try:
                 yield conn
             except Exception as exception:
-                logger.error(f"An unexpected error occurred: {str(exception)}")
-                logger.error(traceback.format_exc())
                 await conn.rollback()
                 raise
 
@@ -53,8 +51,6 @@ class DatabaseSessionManager:
             try:
                 yield conn
             except Exception as exception:
-                logger.error(f"An unexpected error occurred: {str(exception)}")
-                logger.error(traceback.format_exc())
                 await conn.rollback()
                 raise
 

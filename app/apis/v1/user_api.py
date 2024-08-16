@@ -6,7 +6,7 @@ from fastapi_restful.cbv import cbv
 
 from controllers.user_controller import UserController
 from db.database import get_db_session
-from schemas.reset_password import ResetPassword
+from schemas.reset_password import ResetPassword, RestPasswordConfirm
 from schemas.token import Token
 from schemas.user import UserCreate, User
 
@@ -38,3 +38,14 @@ class UserAPI:
     ) -> dict:
         await self.controller.reset_password(reset_password.email, db)
         return {"message": "Mail sent successfully"}
+
+    @router.post("/reset-password/confirm")
+    async def reset_password_confirm(
+        self, confirm_data: RestPasswordConfirm, db=Depends(get_db_session)
+    ) -> dict:
+        await self.controller.validate_token_and_change_password(
+            confirm_data.token.get_secret_value(),
+            confirm_data.new_password.get_secret_value(),
+            db,
+        )
+        return {"message": "Password changed successfully"}
