@@ -16,7 +16,9 @@ from config.constants import (
     ALGORITHM,
     ACCESS_TOKEN_EXPIRE_MINUTES,
     REFRESH_TOKEN_EXPIRE_DAYS,
+    DOMAIN,
 )
+from utils.email_service import send_email
 
 
 class UserController:
@@ -26,7 +28,7 @@ class UserController:
         user_model = User(
             **user.model_dump(show_password=True),
             created_at=epoch_time,
-            updated_at=epoch_time
+            updated_at=epoch_time,
         )
         db.add(user_model)
         await db.flush()
@@ -82,3 +84,65 @@ class UserController:
         return Token(
             access_token=access_token, refresh_token=refresh_token, token_type="bearer"
         )
+
+    @staticmethod
+    async def reset_password(email: str, db: AsyncSession) -> None:
+        user = await UserController.get_user(email, db)
+        if user is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+            )
+        token = await UserController.create_token(
+            {"sub": email, "type": "password_reset_token"},
+            expires_delta=timedelta(hours=1),
+        )
+        reset_link = f"http://{DOMAIN}/reset-password?token={token}"
+        html_content = f"""
+        <html>
+        <head>
+            <style>
+                .email-container {{
+                    font-family: Arial, sans-serif;
+                    color: #333;
+                    line-height: 1.5;
+                }}
+                .email-header {{
+                    background-color: #f8f9fa;
+                    padding: 10px;
+                    text-align: center;
+                }}
+                .email-body {{
+                    padding: 20px;
+                }}
+                .reset-link {{
+                    display: inline-block;
+                    padding: 10px 20px;
+                    margin-top: 20px;
+                    color: white;
+                    background-color: #007bff;
+                    text-decoration: none;
+                    border-radius: 5px;
+                }}
+                .reset-link:hover {{
+                    background-color: #0056b3;
+                }}
+            </style>
+        </head>
+        <body>
+            <div class="email-container">
+                <div class="email-header">
+                    <h2>Password Reset Request</h2>
+                </div>
+                <div class="email-body">
+                    <p>Hello,</p>
+                    <p>We received a request to reset your password. Click the button below to reset your password:</p>
+                    <a href="{reset_link}" class="reset-link">Reset Password</a>
+                    <p>If you did not request a password reset, please ignore this email.</p>
+                    <p>Thank you,</p>
+                    <p>Alpha Beta Corp</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+        send_email("Password Reset Request", html_content, {"email": user.email})

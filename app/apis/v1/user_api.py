@@ -6,6 +6,7 @@ from fastapi_restful.cbv import cbv
 
 from controllers.user_controller import UserController
 from db.database import get_db_session
+from schemas.reset_password import ResetPassword
 from schemas.token import Token
 from schemas.user import UserCreate, User
 
@@ -30,3 +31,10 @@ class UserAPI:
         return await self.controller.login_for_access_token(
             form_data.username, form_data.password, db=db
         )
+
+    @router.post("/reset-password")
+    async def reset_password(
+        self, reset_password: ResetPassword, db=Depends(get_db_session)
+    ) -> dict:
+        await self.controller.reset_password(reset_password.email, db)
+        return {"message": "Mail sent successfully"}
