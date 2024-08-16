@@ -31,10 +31,11 @@ class UserAPI:
     async def login(
         self,
         form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+            background_tasks: BackgroundTasks,
         db=Depends(get_db_session),
     ) -> Token:
         return await self.controller.login_for_access_token(
-            form_data.username, form_data.password, db=db
+            form_data.username, form_data.password, db, background_tasks
         )
 
     @router.post("/reset-password")

@@ -90,7 +90,7 @@ class UserController:
 
     @staticmethod
     async def login_for_access_token(
-        email: str, password: str, db: AsyncSession
+        email: str, password: str, db: AsyncSession, background_tasks: BackgroundTasks
     ) -> Token:
         if not await UserController.validate_user(email, password, db):
             raise HTTPException(
@@ -104,6 +104,18 @@ class UserController:
             data={"sub": email, "type": "refresh_token"},
             expires_delta=timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS),
         )
+        html_content = UserController.env.get_template(
+            "login.html"
+        ).render(email=email)
+        if background_tasks:
+            background_tasks.add_task(
+                send_email,
+                "Login Alert",
+                html_content,
+                {"email": email},
+            )
+        else:
+            send_email("Login Alert", html_content, {"email": email})
         return Token(
             access_token=access_token, refresh_token=refresh_token, token_type="bearer"
         )
