@@ -107,7 +107,7 @@ class UserController:
                     line-height: 1.5;
                 }}
                 .email-header {{
-                    background-color: #f8f9fa;
+                    background-color: peachpuff;
                     padding: 10px;
                     text-align: center;
                 }}
