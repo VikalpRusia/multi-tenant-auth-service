@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, ForeignKey, JSON, BigInteger
-from sqlalchemy.orm import declarative_base
+from sqlalchemy.orm import declarative_base, relationship
 
 from .role import Role
 from .organization import Organization
