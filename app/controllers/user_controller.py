@@ -51,7 +51,11 @@ class UserController:
                 {"email": user.email},
             )
         else:
-            send_email(f"Welcome {user.email} to our service", html_content, {"email": user.email})
+            send_email(
+                f"Welcome {user.email} to our service",
+                html_content,
+                {"email": user.email},
+            )
         return user_model
 
     @staticmethod
@@ -145,12 +149,27 @@ class UserController:
 
     @staticmethod
     async def validate_token_and_change_password(
-        jwt_token: str, new_password, db: AsyncSession
+        jwt_token: str,
+        new_password,
+        db: AsyncSession,
+        background_tasks: BackgroundTasks,
     ):
         email = UserController.extract_email_from_token(
             jwt_token, token_type="password_reset_token"
         )
         await UserController.__change_password(email, new_password, db)
+        html_content = UserController.env.get_template(
+            "password-change-mail.html"
+        ).render(email=email)
+        if background_tasks:
+            background_tasks.add_task(
+                send_email,
+                "Password changed successfully",
+                html_content,
+                {"email": email},
+            )
+        else:
+            send_email("Password changed successfully", html_content, {"email": email})
 
     @staticmethod
     async def __change_password(email: str, new_password: str, db: AsyncSession):

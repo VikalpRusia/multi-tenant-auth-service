@@ -49,11 +49,15 @@ class UserAPI:
 
     @router.post("/reset-password/confirm")
     async def reset_password_confirm(
-        self, confirm_data: RestPasswordConfirm, db=Depends(get_db_session)
+        self,
+        confirm_data: RestPasswordConfirm,
+        background_tasks: BackgroundTasks,
+        db=Depends(get_db_session),
     ) -> dict:
         await self.controller.validate_token_and_change_password(
             confirm_data.token.get_secret_value(),
             confirm_data.new_password.get_secret_value(),
             db,
+            background_tasks,
         )
         return {"message": "Password changed successfully"}
