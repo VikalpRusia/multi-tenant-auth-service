@@ -17,6 +17,7 @@ class Member(MemberBase):
 
 
 class MemberCreate(MemberBase):
+    role_id: int = 1
     model_config = ConfigDict(from_attributes=True)
 
 

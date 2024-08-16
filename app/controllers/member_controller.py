@@ -1,8 +1,10 @@
 import time
 
+import jwt
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from config.constants import SECRET_KEY, ALGORITHM
 from models import Member
 from schemas.member import MemberCreate, UpdateMember
 from schemas.user_invite import UserInvite
@@ -27,7 +29,7 @@ class MemberController:
 
     @staticmethod
     async def update_member(
-        member_id: int, update_member_data: UpdateMember, db: AsyncSession
+            member_id: int, update_member_data: UpdateMember, db: AsyncSession
     ):
         member = await db.scalar(select(Member).where(member_id == Member.id))
         if member:
@@ -39,6 +41,7 @@ class MemberController:
 
     @staticmethod
     async def invite_member(member_invite: UserInvite, db: AsyncSession):
+        decoded_token = jwt.decode(member_invite.token.get_secret_value(), SECRET_KEY, ALGORITHM)
         member = Member(**member_invite.model_dump())
         db.add(member)
         await db.flush()

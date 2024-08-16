@@ -5,6 +5,7 @@ Revises:
 Create Date: 2024-08-16 13:01:40.684397
 
 """
+import time
 from typing import Sequence, Union
 
 from alembic import op
@@ -50,6 +51,7 @@ def upgrade() -> None:
     sa.Column('updated_at', sa.BigInteger(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
+    op.execute(f"INSERT INTO roles VALUES (1,'owner','Owner',{int(time.time())},{int(time.time())})")
     op.create_table('members',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('org_id', sa.Integer(), nullable=False),
